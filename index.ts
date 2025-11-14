@@ -242,6 +242,34 @@ io.on("connection", (socket) => {
     console.log(`[MENSAGEM] Sockets no chat ${chatId}:`, socketsInChat);
   });
 
+  // Notificar que mensagens foram lidas
+  socket.on("chat:messages-read", (data: { chatId: string }) => {
+    const user = users.get(socket.id);
+    
+    if (!user) {
+      socket.emit("error", { message: "Usuário não autenticado" });
+      return;
+    }
+
+    const chatId = data.chatId;
+    
+    // Verifica se o chat existe
+    const chat = io.sockets.adapter.rooms.get(chatId);
+    if (!chat) {
+      socket.emit("error", { message: "Chat não encontrado" });
+      return;
+    }
+
+    // Notifica todos os participantes do chat que as mensagens foram lidas
+    // Isso permite que o cliente atualize o status das mensagens para "read"
+    console.log(`[LIDO] Mensagens marcadas como lidas no chat ${chatId} por ${user.username}`);
+    io.to(chatId).emit("chat:messages-read", {
+      chatId: chatId,
+      readBy: user.username,
+      readAt: new Date()
+    });
+  });
+
   // Lojista lista suas conversas ativas
   socket.on("lojista:conversas", () => {
     const lojista = users.get(socket.id);
