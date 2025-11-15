@@ -242,6 +242,31 @@ io.on("connection", (socket) => {
     console.log(`[MENSAGEM] Sockets no chat ${chatId}:`, socketsInChat);
   });
 
+  // Verificar se há outro usuário no chat
+  socket.on("chat:check-presence", (data: { chatId: string }, callback: (response: { hasOtherUser: boolean }) => void) => {
+    const user = users.get(socket.id);
+    
+    if (!user) {
+      callback({ hasOtherUser: false });
+      return;
+    }
+
+    const chatId = data.chatId;
+    const chat = io.sockets.adapter.rooms.get(chatId);
+    
+    if (!chat) {
+      callback({ hasOtherUser: false });
+      return;
+    }
+
+    // Verifica se há pelo menos 2 pessoas no chat (o próprio usuário + outro)
+    // Um chat deve ter exatamente 2 participantes (cliente + lojista)
+    const hasOtherUser = chat.size >= 2;
+    
+    console.log(`[PRESENÇA] Chat ${chatId}: ${chat.size} participantes, outro usuário presente: ${hasOtherUser}`);
+    callback({ hasOtherUser });
+  });
+
   // Notificar que mensagens foram lidas
   socket.on("chat:messages-read", (data: { chatId: string }) => {
     const user = users.get(socket.id);
@@ -257,6 +282,13 @@ io.on("connection", (socket) => {
     const chat = io.sockets.adapter.rooms.get(chatId);
     if (!chat) {
       socket.emit("error", { message: "Chat não encontrado" });
+      return;
+    }
+
+    // Verifica se há outro usuário no chat antes de marcar como lido
+    // Um chat deve ter pelo menos 2 participantes para marcar como lido
+    if (chat.size < 2) {
+      console.log(`[LIDO] Não há outro usuário no chat ${chatId}, não marcando como lido`);
       return;
     }
 
