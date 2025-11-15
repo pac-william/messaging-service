@@ -1,15 +1,33 @@
 # messaging-service
 
-To install dependencies:
+Serviço de mensageria em tempo real usando Socket.IO.
+
+## Instalação
 
 ```bash
-bun install
+npm install
 ```
 
-To run:
+## Executar
+
+Para executar em modo de produção:
 
 ```bash
-bun run index.ts
+npm start
 ```
 
-This project was created using `bun init` in bun v1.2.22. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+Para executar em modo de desenvolvimento (com watch):
+
+```bash
+npm run dev
+```
+
+Para compilar TypeScript:
+
+```bash
+npm run build
+```
+
+## Configuração
+
+O serviço roda na porta definida pela variável de ambiente `PORT` ou padrão `4000`.

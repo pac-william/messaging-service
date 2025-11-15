@@ -1,17 +1,19 @@
 {
   "name": "messaging-service",
-  "module": "index.ts",
+  "version": "1.0.0",
   "type": "module",
   "private": true,
+  "main": "index.ts",
   "scripts": {
-    "start": "bun run index.ts",
-    "dev": "bun run --watch index.ts"
+    "start": "tsx index.ts",
+    "dev": "tsx watch index.ts",
+    "build": "tsc",
+    "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
+    "@types/node": "^20.10.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
   },
   "dependencies": {
     "socket.io": "^4.8.1"
