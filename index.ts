@@ -356,6 +356,40 @@ io.on("connection", (socket) => {
     socket.emit("cliente:conversas", conversas);
   });
 
+  // Indicador de digitação - usuário começou a digitar
+  socket.on("chat:typing-start", () => {
+    const user = users.get(socket.id);
+    const chatId = userChats.get(socket.id);
+    
+    if (!user || !chatId) {
+      return;
+    }
+
+    // Notifica os outros participantes do chat que este usuário está digitando
+    socket.to(chatId).emit("chat:typing", {
+      chatId: chatId,
+      username: user.username,
+      isTyping: true
+    });
+  });
+
+  // Indicador de digitação - usuário parou de digitar
+  socket.on("chat:typing-stop", () => {
+    const user = users.get(socket.id);
+    const chatId = userChats.get(socket.id);
+    
+    if (!user || !chatId) {
+      return;
+    }
+
+    // Notifica os outros participantes do chat que este usuário parou de digitar
+    socket.to(chatId).emit("chat:typing", {
+      chatId: chatId,
+      username: user.username,
+      isTyping: false
+    });
+  });
+
   // Desconexão
   socket.on("disconnect", () => {
     const user = users.get(socket.id);
